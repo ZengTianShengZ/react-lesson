@@ -13,15 +13,9 @@ app.use(require('webpack-dev-middleware')(compiler, {
 	inline: true,
 	progress: true,
 	stats: {
-		colors: true,
+	colors: true,
 	}
 }));
-
-//代理服务器
-app.use('/shopro', proxyMiddleware({
-    target: 'http://dev.fe.ptdev.cn',
-    changeOrigin: true,
-}))
 
 app.use(require('webpack-hot-middleware')(compiler));
 
