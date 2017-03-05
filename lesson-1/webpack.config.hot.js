@@ -10,7 +10,6 @@ var BUILD_PATH = path.resolve(ROOT_PATH, '/build/static'); //发布文件所存�
 
 
 module.exports = {
-    devtool: 'cheap-module-eval-source-map',
     entry: {
         app: [
             'webpack-hot-middleware/client',
@@ -22,6 +21,10 @@ module.exports = {
         path: BUILD_PATH, //发布文件地址
         filename: '[name].js', //编译后的文件名字
         chunkFilename: '[name].[chunkhash:5].min.js',
+    },
+    devtool: 'cheap-module-eval-source-map',
+    resolve: {
+        extensions: ['', '.js', '.jsx', '.less', '.scss', '.css'], //后缀名自动补全
     },
     module: {
         loaders: [{
@@ -77,8 +80,5 @@ module.exports = {
         }),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoErrorsPlugin()
-    ],
-    resolve: {
-        extensions: ['', '.js', '.jsx', '.less', '.scss', '.css'], //后缀名自动补全
-    }
+    ]
 };

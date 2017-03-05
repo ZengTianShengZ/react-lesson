@@ -1,8 +1,6 @@
-## lesson 1
 
-> 学习了webpack有一段时间,写份笔记做记录 .
+## lesson-1主要内容:构建一套基于React开发的脚手架
 
-### lesson-1主要内容:构建一套基于开React开发的脚手架
 特性
 
 - react
@@ -42,11 +40,10 @@ CommonJs 模块、 AMD 模块、 ES6 模块、CSS、图片、 JSON、Coffeescrip
  切到 在lesson-1 的根目录下执行
 ```
  npm install
- // 如果是 Mac 需要权限
- sudo npm install
  // 如果安装过 npm 淘宝镜像
  cnpm install
-
+ // 如果是 Mac 需要权限
+ sudo npm install
 ```
 
 开发过程中你会用到以下命令:
@@ -58,8 +55,9 @@ CommonJs 模块、 AMD 模块、 ES6 模块、CSS、图片、 JSON、Coffeescrip
 | npm run hot  | 改命令是同上 其实是执行 node server.hot.js   |     
 | npm run build | 改命令是同上 ，会执行 webpack --config webpack.config.dist.js --progress --colors --watch -p|  ##
 
-#### 1, webpack 命令
+### 一、 webpack  基础讲解
 
+> lesson-1 根目录下 执行 ‘ webpack ’ 命令
 >执行该命令会执行 根目录下 webpack.config.js  ,其实这里是为了讲解 webpack 的工作原理和演示
 > 项目用的最多的是 webpack.config.hot.js 和 webpack.config.build.js 后面会做讲解
 
@@ -67,7 +65,7 @@ webpack.config.js 大致流程图:
 ![](./mdimg/img3.png)
 
 
-#### (1)、entry
+#### 1、entry
 
 ```
 entry: {
@@ -77,13 +75,13 @@ entry: {
 
 指定一个入口文件,webpack将会顺藤摸瓜识别所依赖的文件,再一个个进行接下去的解析处理
 
-#### (2)、output
+#### 2、output
 
 ```
 output: {
-        publicPath: '/pxq/dist/', //编译好的文件，在服务器的路径,这是静态资源引用路径
-        path: BUILD_PATH, //编译到当前目录
-        filename: '[name].js', //编译后的文件名字
+        publicPath: './static/',     //编译好的文件，在服务器的路径,这是静态资源引用路径
+        path: BUILD_PATH,            //编译到当前目录
+        filename: '[name].js',       //编译后的文件名字
         chunkFilename: '[name].[chunkhash:5].min.js',
     },
 ```
@@ -98,7 +96,7 @@ output: {
 
 会对输出的文件添加后缀 , 一个5位的 hash 值
 
-#### (3)、devtool
+#### 3、devtool
 
 ```
 devtool: 'cheap-module-eval-source-map',
@@ -107,7 +105,7 @@ devtool: 'cheap-module-eval-source-map',
 除了输出编译后的文件外,还会顺带输出一个 Source Map 。什么是 Source Map呢，Source map就是一个信息文件，里面储存着位置信息。也就是说，转换后的代码的每一个位置，所对应的转换前的位置。如转码后的 ES6文件或 React的jsx文件 当代码出错我们很难找到对应的出错位置，那
 Source Map 就提供了一个对应关系，来指出错误的位置。
 
-#### （4）、resolve
+#### 4、resolve
 
 ```
 resolve: {
@@ -118,7 +116,7 @@ resolve: {
 
 >import demo from 'demo';
 
-#### (5)、module
+#### 5、module
 ```
 module: {
       loaders: [{
@@ -173,24 +171,33 @@ webpack 的核心部分就是各种 loader 了 ，webpack 拿到入口文件，�
 
 > test: /\.(png|jpg)$/,
 
+```
+{
+    test: /\.(png|jpg)$/,
+    exclude: /^node_modules$/,
+    loader: 'url-loader?limit=8192&name=images/[hash:8].[name].[ext]',
+    //注意后面那个limit的参数，当你图片大小小于这个限制的时候，会自动启用base64编码图片
+    include: [APP_PATH]
+}
+```
 图片干嘛需要 loader呢，上面也解释了 可以将一个较小的图片进行 base64转换
 
 > test: /\.jsx$/,
 React 独有的 .jsx 文件 ，相对 .js文件多了一步 jsx-loader
 
-#### （6）、plugins
+#### 6、plugins
 ```
 plugins: [
         new webpack.DefinePlugin({
             'process.env': {
-                NODE_ENV: JSON.stringify('development') //定义编译环境
+                NODE_ENV: JSON.stringify('development')    //定义编译环境
             },
             'cdnUrl':JSON.stringify('http:demo.com/'),
             'dev': true
         }),
-        new HtmlWebpackPlugin({  //根据模板插入css/js等生成最终HTML
-            filename: '../index.html', //生成的html存放路径，相对于 path
-            template: './src/template/index.html', //html模板路径
+        new HtmlWebpackPlugin({                            //根据模板插入css/js等生成最终HTML
+            filename: '../index.html',                     //生成的html存放路径，相对于 path
+            template: './src/template/index.html',         //html模板路径
             hash: false,
         }),
         new ExtractTextPlugin('[name].css')
@@ -234,6 +241,7 @@ plugins: [
 用法上面有注释就不多说。
 
 > ExtractTextPlugin
+
 ```
 plugins: [
         new ExtractTextPlugin('[name].css')
@@ -242,3 +250,135 @@ plugins: [
 我们会在 .js 文件 import .css 或 .scss 文件，webpack 编译 .js 文件时会将这个css文件打包进了 js文件里头。
 但有时我们的 css文件比较大或想单独拿出来，那就可以利用这个插件 ExtractTextPlugin ，目的是生成单独的一份 css
 文件，而不是打包到 .js 文件里头
+
+编译前：
+![](./mdimg/img5.png)
+编译后：
+![](./mdimg/img6.png)
+
+
+### 二、开发环境下的 webpack -- 热刷新
+
+在实际开发中不可能编译一下webpack 在浏览器刷新看一下结果，编辑完再编译一下webpack，再刷新浏览器看一下效果。这样工作效率非常低
+也很不爽。
+下面咱们就来构建一套实际开发时的 webpack 来构建项目。webpack 的配置整体上跟第一节讲的差不多，主要在热部署上多做些处理而已。
+
+#### 1、启动热刷新
+与第一节不同的是，我们不是通过命令行 `webpack` 来启动编译，而是通过一个service服务 。可以在lesson-1 根目录下执行命令
+
+> npm run hot  或  node server_hot.js  // 其实 npm run hot 也是找的跟目录下的 package.json 执行 node server_hot.js 的
+
+执行完命令 试着改变一样 js文件或scss文件保存一下，发现浏览器页面是自动刷新的。但 build 目录下却不见得有任何输出。
+这是因为我们使用了 热刷新 的一个`中间件` ，每次保存完文件会自动编译项目中依赖的 js 和 css 文件，编译完的输出文件输出到
+`计算机的内存中` 这样在开发的过程中不用每次读写硬盘，速度也会快很多
+
+#### 2、中间件 webpack-dev-middleware
+上面第一小点提到一个`中间件`，那这个中间件到底怎么工作的呢，会使得咱们在开发过程中热刷新。或者说 执行命令行 `npm run hot`后
+都做了哪些。下面一幅图带你理解：
+![](./mdimg/img7.png)
+其中：
+#### 3、 npm run hot
+运行命令行 `npm run hot` 其中就是执行 `server_hot.js` 这个文件，启动一个 server ，里面涉及到 nodejs的一些知识和Node.js Express 框架 ，对这一块不太熟悉的可以看这里 [Node.js 教程| 菜鸟教程](http://www.runoob.com/nodejs/nodejs-express-framework.html)
+
+##### （1）、分析 server_hot.js
+```
+var webpack = require('webpack');
+var express = require('express');
+var config = require('./webpack.config.hot');
+
+var app = express();
+var compiler = webpack(config);
+
+app.use(require('webpack-dev-middleware')(compiler, {
+	publicPath: config.output.publicPath,
+	hot: true,
+	historyApiFallback: true,
+	inline: true,
+	progress: true,
+	stats: {
+	colors: true,
+	}
+}));
+
+app.use(require('webpack-hot-middleware')(compiler));自动刷新的消息通知依靠的是浏览器和服务器之间的web socket连接
+
+//将其他路由，全部返回index.html
+app.get('*', function(req, res) {
+	res.sendFile(__dirname + '/index.html')
+});
+
+app.listen(8088, function() {
+	console.log('正常打开8088端口')
+});
+
+```
+
+##### （2）、看一下下面例子解释一样 app.use（）
+
+
+```
+var express = require('express');
+var app = express();
+app.use(function (req, res, next) {   // 没指定路径默认是 app.use('/',function(){}) 访问根路径                                                    //会进入这个函数
+  console.log('Time:', Date.now());
+  next();
+});
+```
+也就是 当 服务端接收到一个请求时，回先被 app.use（）拦截下，因为这么咱们使用了默认路径，也就是根路径
+如 访问 http://127.0.0.1:8088/
+app.use（）处理完事情就会交给 下面的 get 或 post 请求了：
+```
+//将其他路由，全部返回index.html
+app.get('*', function(req, res) {
+	res.sendFile(__dirname + '/index.html')
+});
+```
+这里 get 收到请求后就给浏览器一个 响应（response） `res.sendFile()` 对浏览器输出 index.html
+
+##### （3）、看一下 webpack-dev-middleware 中间件
+
+```
+app.use(require('webpack-dev-middleware')(compiler, {
+	publicPath: config.output.publicPath,
+	hot: true,
+	historyApiFallback: true,
+	inline: true,
+	progress: true,
+	stats: {
+	colors: true,
+	}
+}));
+```
+上面一小点说到了 app.use 会收到请求后先做一些处理 ，处理内容就是 webpack-dev-middleware 来完成,
+这也是热更新的关键。自动刷新的消息通知依靠的是浏览器和服务器之间的 `web socket` 连接. 当保存一下文件（command+s或Ctrl+s）
+浏览器就会通过 连接 向服务端发送请求，服务端接收请求后 先被 app.use（）拦截下来，经过 webpack-dev-middleware 中间件
+处理,处理完 交给 app.get（）输出 index.html 到浏览器，至此，浏览器自动刷新完成！
+其中 webpack-dev-middleware 中间件 接收两个参数，一个是 `webpack(config)` 这就是用于编译 js css 的配置文件了，咱们下第一
+大节已经介绍了，里面的内容跟第一大节差不多，几处修改后面会解释。第二个参数是一个配置对象 具体看[github](https://github.com/webpack/webpack-dev-middleware)
+
+##### （4）、 最后看一下 webpack-hot-middleware
+
+```
+app.use(require('webpack-hot-middleware')(compiler));
+```
+如果一些文件的小改动比如 改变一个 div 的颜色啊，都有经过一大堆的编译那效率就太低了，所以 webpack-hot-middleware 可以对一下小
+改动快速刷新浏览器，配合 webpack-dev-middleware 使用。
+
+### 4、 热跟新的配置文件 webpack.config.hot.js
+这个配置文件其实跟第一大节讲的并无太大区别，只不过要配合热刷新需要新添加如下配置：
+entry 添加 webpack-hot-middleware/client
+```
+entry: {
+    app: [
+        'webpack-hot-middleware/client',
+        APP_FILE
+    ]
+},
+```
+plugins 添加如下：
+```
+plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NoErrorsPlugin()
+]
+```
