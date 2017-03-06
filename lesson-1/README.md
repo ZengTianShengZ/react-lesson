@@ -1,17 +1,20 @@
 
-## lesson-1主要内容:构建一套基于React开发的脚手架
+## lesson-1主要内容:构建一套适合 React、ES6 开发的脚手架
 
-特性
+### Features
 
-- react
-- redux
-- react-router
-- react-router-redux
-- webpack
-- babel
-- express
-- ES6
-
+- 可以解析JSX语法
+- 可以解析ES6语法新特性
+- 支持LESS、SCSS预处理器
+- 编译完成自动打开浏览器
+- 单独分离CSS样式文件
+- 支持文件MD5戳，解决文件缓存问题
+- 支持图片、图标字体等资源的编译
+- 支持浏览器源码调试
+- 实现组件级热更新
+- 实现代码的热替换，浏览器实时刷新查看效果
+- 区分开发环境和生产环境
+- 分离业务功能代码和公共依赖代码
 
 ### 前言:
 
@@ -35,9 +38,11 @@ CommonJs 模块、 AMD 模块、 ES6 模块、CSS、图片、 JSON、Coffeescrip
 ![](./mdimg/img2.png)
 
 
-### 项目构建
+### 项目构建，安装必要包
 
- 切到 在lesson-1 的根目录下执行
+clone `git@github.com:ZengTianShengZ/react-lesson.git`
+
+切到 在lesson-1 的根目录下执行以下命令，安装必要包
 ```
  npm install
  // 如果安装过 npm 淘宝镜像
@@ -46,7 +51,7 @@ CommonJs 模块、 AMD 模块、 ES6 模块、CSS、图片、 JSON、Coffeescrip
  sudo npm install
 ```
 
-开发过程中你会用到以下命令:
+开发过程中你会用到以下命令进行打包编译:
 
 | lesson-1根目录下运行命令行       | 解释   |  
 | ------------- |:-------------:|  
@@ -59,7 +64,7 @@ CommonJs 模块、 AMD 模块、 ES6 模块、CSS、图片、 JSON、Coffeescrip
 
 > lesson-1 根目录下 执行 ‘ webpack ’ 命令
 >执行该命令会执行 根目录下 webpack.config.js  ,其实这里是为了讲解 webpack 的工作原理和演示
-> 项目用的最多的是 webpack.config.hot.js 和 webpack.config.build.js 后面会做讲解
+> 项目用的最多的是执行 webpack.config.hot.js 和 webpack.config.build.js 后面会做讲解
 
 webpack.config.js 大致流程图:
 ![](./mdimg/img3.png)
@@ -338,8 +343,8 @@ app.use(function (req, res, next) {   // 没指定路径默认是 app.use('/',fu
   next();
 });
 ```
-也就是 当 服务端接收到一个请求时，回先被 app.use（）拦截下，因为这么咱们使用了默认路径，也就是根路径
-如 访问 http://127.0.0.1:8088/
+也就是 当 服务端接收到一个请求时，会先被 app.use（）拦截下，因为 app.use（）没有指定路径，默认接收根路径，
+如 访问 http://127.0.0.1:8088/ ，那么网络请求就会先被app.use（）拦截下。
 
 app.use（）处理完事情就会交给 下面的 get 或 post 请求了：
 ```
@@ -368,8 +373,8 @@ app.use(require('webpack-dev-middleware')(compiler, {
 这也是热更新的关键。自动刷新的消息通知依靠的是浏览器和服务器之间的 `web socket` 连接. 当保存一下文件（command+s或Ctrl+s）
 浏览器就会通过 连接 向服务端发送请求，服务端接收请求后 先被 app.use（）拦截下来，经过 webpack-dev-middleware 中间件
 处理,处理完 交给 app.get（）输出 index.html 到浏览器，至此，浏览器自动刷新完成！
-其中 webpack-dev-middleware 中间件 接收两个参数，一个是 `webpack(config)` 这就是用于编译 js css 的配置文件了，咱们下第一
-大节已经介绍了，里面的内容跟第一大节差不多，几处修改后面会解释。第二个参数是一个配置对象 具体看[github](https://github.com/webpack/webpack-dev-middleware)
+
+其中 webpack-dev-middleware 中间件 接收两个参数，一个是 `webpack(config)` 这就是用于编译 js css 的配置文件了，咱们在第一大节已经介绍了，里面的内容跟第一大节差不多，几处修改后面会解释。第二个参数是一个配置对象 具体看[github-webpack-dev-middleware](https://github.com/webpack/webpack-dev-middleware)
 
 ##### （4）、 最后看一下 webpack-hot-middleware
 
@@ -556,8 +561,8 @@ webpack.config.build.js 新添了几个 plugins 。首先要清楚的一点是 w
 ### 总结
 
 lesson-1 主要是对 webpack 打包编译的一些讲解和梳理。
-第一节讲了 webpack 的简单工作原理，
-第二节讲了 实际开发过程中 支持浏览器自动刷新，对webpack进行相应的改造，
-第三节讲了 将项目发布到线上的一些实际打包的工作流程。
+- 第一节讲了 webpack 的简单工作原理，                               // webpack
+- 第二节讲了 实际开发过程中 支持浏览器自动刷新，对webpack进行相应的改造， // npm run hot
+- 第三节讲了 将项目发布到线上的一些实际打包的工作流程。                 // npm run build
 
 后面还有 lesson 来讲解 React 配合 Redux、 Router 在实际项目中的应用和开发，喜欢的话可以先 `star` 一些哦！！！

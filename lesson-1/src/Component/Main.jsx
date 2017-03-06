@@ -8,7 +8,7 @@ class Main extends Component {
     return(
         <div>
           <h1>lesson 1 </h1>
-          <p>webpack 构建 react 项目 流程 </p>
+          <p>webpack 构建一套适合 React、ES6 开发的脚手架 </p>
         </div>
     )
   }
