@@ -7,7 +7,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin'); //生成html
 var ROOT_PATH = path.resolve(__dirname);
 var APP_PATH = path.resolve(ROOT_PATH, 'src'); //__dirname 中的src目录，以此类推
 var APP_FILE = path.resolve(APP_PATH, 'app'); //根目录文件app.jsx地址
-var BUILD_PATH = path.resolve(ROOT_PATH, 'pxq/dist'); //发布文件所存放的目录/pxq/dist/前面加/报错？
+var BUILD_PATH = path.resolve(ROOT_PATH, './build/static'); //发布文件所存放的目录/pxq/dist/前面加/报错？
 
 
 module.exports = {
@@ -24,10 +24,13 @@ module.exports = {
         ]
     },
     output: {
-        publicPath: '/pxq/dist/', //编译好的文件，在服务器的路径,域名会自动添加到前面
+      //  publicPath: '/build/static/', //编译好的文件，在服务器的路径,域名会自动添加到前面
         path: BUILD_PATH, //编译到当前目录
         filename: '[name].js', //编译后的文件名字
         chunkFilename: '[name].[chunkhash:5].min.js',
+    },
+    resolve: {
+        extensions: ['', '.js', '.jsx', '.less', '.scss', '.css'] //后缀名自动补全
     },
     module: {
         loaders: [{
@@ -78,14 +81,11 @@ module.exports = {
         new webpack.optimize.CommonsChunkPlugin("common", "common.bundle.js"),
         new webpack.optimize.UglifyJsPlugin({
             output: {
-                comments: false, // remove all comments
+                comments: false, // remove all comments （移除所有注释）
             },
-            compress: {
+            compress: {          // 压缩
                 warnings: false
             }
         })
-    ],
-    resolve: {
-        extensions: ['', '.js', '.jsx', '.less', '.scss', '.css'] //后缀名自动补全
-    }
+    ]
 };

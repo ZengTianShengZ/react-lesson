@@ -149,7 +149,7 @@ webpack 的核心部分就是各种 loader 了 ，webpack 拿到入口文件，�
 
 当依赖文件有以 .scss 后缀的文件，会先执行 sass-loader 再 执行 autoprefixer-loader（给一些css3添加后缀的loader）
 接着执行 css-loader ，这才转化成立 .css 文件，才能作用于浏览器，而 style-loader 是将 .css 文件插入到 html的 head 头部
-也许你会注意到 ExtractTextPlugin() 包裹一堆loader是干嘛的，这样放着下面 webpack的插件这一节讲
+也许你会注意到 ExtractTextPlugin() 包裹一堆loader是干嘛的，这个放着下面 webpack的插件这一节讲
 
 > test: /\.js$/,
 
@@ -206,6 +206,17 @@ plugins: [
 其中：
 > DefinePlugin
 
+```
+plugins: [
+        new webpack.DefinePlugin({
+            'process.env': {
+                NODE_ENV: JSON.stringify('development')    //定义编译环境
+            },
+            'cdnUrl':JSON.stringify('http:demo.com/'),
+            'dev': true
+        })
+    ]
+```
 定义一下全局变量，可以在模块中使用这些变量
 如一个项目中依赖的 demo.js 文件
 ```
@@ -252,8 +263,11 @@ plugins: [
 文件，而不是打包到 .js 文件里头
 
 编译前：
+
 ![](./mdimg/img5.png)
+
 编译后：
+
 ![](./mdimg/img6.png)
 
 
@@ -276,7 +290,7 @@ plugins: [
 上面第一小点提到一个`中间件`，那这个中间件到底怎么工作的呢，会使得咱们在开发过程中热刷新。或者说 执行命令行 `npm run hot`后
 都做了哪些。下面一幅图带你理解：
 ![](./mdimg/img7.png)
-其中：
+
 #### 3、 npm run hot
 运行命令行 `npm run hot` 其中就是执行 `server_hot.js` 这个文件，启动一个 server ，里面涉及到 nodejs的一些知识和Node.js Express 框架 ，对这一块不太熟悉的可以看这里 [Node.js 教程| 菜鸟教程](http://www.runoob.com/nodejs/nodejs-express-framework.html)
 
@@ -313,7 +327,7 @@ app.listen(8088, function() {
 
 ```
 
-##### （2）、看一下下面例子解释一样 app.use（）
+##### （2）、看一下下面例子解释一下 app.use（）
 
 
 ```
@@ -326,6 +340,7 @@ app.use(function (req, res, next) {   // 没指定路径默认是 app.use('/',fu
 ```
 也就是 当 服务端接收到一个请求时，回先被 app.use（）拦截下，因为这么咱们使用了默认路径，也就是根路径
 如 访问 http://127.0.0.1:8088/
+
 app.use（）处理完事情就会交给 下面的 get 或 post 请求了：
 ```
 //将其他路由，全部返回index.html
@@ -361,7 +376,7 @@ app.use(require('webpack-dev-middleware')(compiler, {
 ```
 app.use(require('webpack-hot-middleware')(compiler));
 ```
-如果一些文件的小改动比如 改变一个 div 的颜色啊，都有经过一大堆的编译那效率就太低了，所以 webpack-hot-middleware 可以对一下小
+如果一些文件的小改动比如 改变一个 div 的颜色啊，都有经过一大堆的编译那效率就太低了，所以 webpack-hot-middleware 可以对一些小
 改动快速刷新浏览器，配合 webpack-dev-middleware 使用。
 
 ### 4、 热跟新的配置文件 webpack.config.hot.js
@@ -382,3 +397,167 @@ plugins: [
     new webpack.NoErrorsPlugin()
 ]
 ```
+
+### 三、 线上环境下的 webpack
+
+一般呢，项目开发完要发布到服务器，是需要配合另一套的项目打包流程的，发布到服务器的项目是不需要热更新等一些辅助开发的流程，
+但同时根据项目的情况需要加入一些比如 压缩代码，抽离公共代码，异步加载js 等 需求。下面配合打包线上项目的 `webpack.config.build.js`
+来说一下如何打包线上项目的。
+
+#### 1、npm run build
+
+在lesson-1 根目录下运行命令 `npm run build` ，根目录会输出以下文件：
+
+![](./mdimg/img8.png)
+
+运行命令 `npm run build` 是找到 根目录下的 package.json 文件执行 scripts 下的 build命令，其实就是执行：
+```
+"build": "webpack --config webpack.config.build.js --progress --colors --watch -p"
+```
+> --config webpack.config.build.js 指定 命令执行的文件
+> --progress 指定在控制台输出进度条
+> --colors  控制台显示颜色
+
+#### 2、分析 webpack.config.build.js
+```
+var path = require('path');
+var webpack = require('webpack');
+var ExtractTextPlugin = require('extract-text-webpack-plugin'); //css单独打包
+var HtmlWebpackPlugin = require('html-webpack-plugin'); //生成html
+
+//定义地址
+var ROOT_PATH = path.resolve(__dirname);
+var APP_PATH = path.resolve(ROOT_PATH, 'src');              //__dirname 中的src目录，以此类推
+var APP_FILE = path.resolve(APP_PATH, 'app');               //根目录文件app.jsx地址
+var BUILD_PATH = path.resolve(ROOT_PATH, './build/static'); //发布文件所存放的目录/pxq/dist/前面加/报错？
+
+module.exports = {
+    entry: {
+        app: APP_FILE,
+        common: [
+            "react",
+            'react-dom',
+            'react-router',
+            'redux',
+            'react-redux',
+            'redux-thunk',
+            'immutable'
+        ]
+    },
+    output: {
+        //publicPath: 'http:example.cdn/',   // 给资源文件添加前缀，一般会把静态资源发布的 cdn 上
+        path: BUILD_PATH,                    //编译到当前目录
+        filename: '[name].js',               //编译后的文件名字
+        chunkFilename: '[name].[chunkhash:5].min.js',
+    },
+    resolve: {
+        extensions: ['', '.js', '.jsx', '.less', '.scss', '.css'] //后缀名自动补全
+    },
+    module: {
+        loaders: [{
+            test: /\.js$/,
+            exclude: /^node_modules$/,
+            loader: 'babel'
+        }, {
+            test: /\.css$/,
+            exclude: /^node_modules$/,
+            loader: ExtractTextPlugin.extract('style', ['css', 'autoprefixer'])
+        }, {
+            test: /\.less$/,
+            exclude: /^node_modules$/,
+            loader: ExtractTextPlugin.extract('style', ['css', 'autoprefixer', 'less'])
+        }, {
+            test: /\.scss$/,
+            exclude: /^node_modules$/,
+            loader: ExtractTextPlugin.extract('style', ['css', 'autoprefixer', 'sass'])
+        }, {
+            test: /\.(eot|woff|svg|ttf|woff2|gif|appcache)(\?|$)/,
+            exclude: /^node_modules$/,
+            loader: 'file-loader?name=[name].[ext]'
+        }, {
+            test: /\.(png|jpg|gif)$/,
+            exclude: /^node_modules$/,
+            loader: 'url-loader?limit=8192&name=images/[hash:8].[name].[ext]',
+            //注意后面那个limit的参数，当你图片大小小于这个限制的时候，会自动启用base64编码图
+        }, {
+            test: /\.jsx$/,
+            exclude: /^node_modules$/,
+            loaders: ['jsx', 'babel']
+        }]
+    },
+    plugins: [
+        new webpack.DefinePlugin({
+            'process.env': {
+                NODE_ENV: JSON.stringify('production') //定义生产环境
+            }
+        }),
+        new HtmlWebpackPlugin({                    //根据模板插入css/js等生成最终HTML
+            filename: '../index.html',             //生成的html存放路径，相对于 path
+            template: './src/template/index.html', //html模板路径
+            inject: 'body',
+            hash: true,
+        }),
+        new ExtractTextPlugin('[name].css'),
+        //提取出来的样式和common.js会自动添加进发布模式的html文件中，原来的html没有
+        new webpack.optimize.CommonsChunkPlugin("common", "common.bundle.js"),
+        new webpack.optimize.UglifyJsPlugin({
+            output: {
+                comments: false, // remove all comments （移除所有注释）
+            },
+            compress: {          // 压缩
+                warnings: false
+            }
+        })
+    ]
+};
+```
+与前面讲的第一大节相比，并无明显区别，主要是加了一些将项目发布到服务的线上流程。
+其中：
+##### （1）、entry
+```
+entry: {
+    app: APP_FILE,
+    common: [
+        "react",
+        'react-dom',
+        'react-router',
+        'redux',
+        'react-redux',
+        'redux-thunk',
+        'immutable'
+    ]
+},
+```
+添加了 common 用来单独打包出公共部分的 js代码
+
+##### （2）、plugins
+
+```
+plugins: [
+    new ExtractTextPlugin('[name].css'),
+    new webpack.optimize.CommonsChunkPlugin("common", "common.bundle.js"),
+    new webpack.optimize.UglifyJsPlugin({
+        output: {
+            comments: false, // remove all comments （移除所有注释）
+        },
+        compress: {          // 压缩
+            warnings: false
+        }
+    })
+]
+```
+webpack.config.build.js 新添了几个 plugins 。首先要清楚的一点是 webpack 是将一块块的依赖打包的一个文件里头的，
+不管是 js 、scss、less、css、jsx 文件都会编译成一块块的代码打包到一个文件里头。那插件可以将一块块的代码看是压缩或提取出来
+`ExtractTextPlugin` 插件的作用就是将 css块区域的代码单独提取出来的。
+`CommonsChunkPlugin` 是用来提取公用的代码块。有两个参数 `common` 是对应 entry 的字段，`common.bundle.js`是将
+公共代码输出到 `common.bundle.js` 文件里。
+`UglifyJsPlugin` 是将打包后的代码镜像压缩。
+
+### 总结
+
+lesson-1 主要是对 webpack 打包编译的一些讲解和梳理。
+第一节讲了 webpack 的简单工作原理，
+第二节讲了 实际开发过程中 支持浏览器自动刷新，对webpack进行相应的改造，
+第三节讲了 将项目发布到线上的一些实际打包的工作流程。
+
+后面还有 lesson 来讲解 React 配合 Redux、 Router 在实际项目中的应用和开发，喜欢的话可以先 `star` 一些哦！！！

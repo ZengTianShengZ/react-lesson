@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node server.js",
     "hot": "node server_hot.js",
-    "build": "webpack --config webpack.config.dist.js --progress --colors --watch -p"
+    "build": "webpack --config webpack.config.build.js --progress --colors --watch -p"
   },
   "repository": {
     "type": "github",
