@@ -1,0 +1,7 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  background: red; }
+
+h1, p {
+  text-align: center; }
