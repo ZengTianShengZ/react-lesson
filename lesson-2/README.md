@@ -1,568 +1,334 @@
+## lesson-2 主要内容: Redux 的设计思想
 
-## lesson-1主要内容:构建一套适合 React、ES6 开发的脚手架
+### 前言
+Redux是什么呢？一个状态管理工具。那是干嘛用的呢？都知道，React可以进行单页应用的开发，可以对页面
+中各个模块进行分割形成组件，而组件之间就避免不了事件的传递或数据的交互，那Redux就是用来对这些组件
+的状态进行管理的。就好比买家和卖家，快递是交给第三方（Redux）去完成。
 
-### Features
-
-- 可以解析JSX语法
-- 可以解析ES6语法新特性
-- 支持LESS、SCSS预处理器
-- 编译完成自动打开浏览器
-- 单独分离CSS样式文件
-- 支持文件MD5戳，解决文件缓存问题
-- 支持图片、图标字体等资源的编译
-- 支持浏览器源码调试
-- 实现组件级热更新
-- 实现代码的热替换，浏览器实时刷新查看效果
-- 区分开发环境和生产环境
-- 分离业务功能代码和公共依赖代码
-
-### 前言:
-
-Webpack 是当下最热门的前端资源模块化管理和打包工具。它可以将许多松散的模块按照依赖和规则打包成符合生产环境部署的前端资源。
-还可以将按需加载的模块进行代码分隔，等到实际需要的时候再异步加载。通过 loader 的转换，任何形式的资源都可以视作模块，比如
-CommonJs 模块、 AMD 模块、 ES6 模块、CSS、图片、 JSON、Coffeescript、 LESS 等。
-
-#### Webpack 和 gulp 没有可比性
-
-也许你用过gulp,有了gulp你可以对css ,js 文件进行压缩合并等处理,但随着前端技术不断发展,出现了前端资源模块化,资源按需
-加载,ES6模块等,利用gulp来构建你的项目就显得力不从心了.如果非要做个对比的话,下面给出两张工作流程图片就明白了
-
->Grunt和Gulp的工作方式是：在一个配置文件中，指明对某些文件进行类似编译，组合，压缩等任务的具体步骤，这个工具之后可以自动替你
-完成这些任务。
+### 前言（续）
+也行你会说，React不是有自己的一套数据传递和事件管理机制么，何必要引入第三方来插一脚，那么麻烦呢。
+这里有一些场景来说明引用 React 是否必要：
+#### 1、你不需要使用Redux
+```
+用户的使用方式非常简单
+用户之间没有协作
+不需要与服务器大量交互，也没有使用 WebSocket
+视图层（View）只从单一来源获取数据
+```
+#### 2、你需要Redux
+```
+用户的使用方式复杂
+不同身份的用户有不同的使用方式（比如普通用户和管理员）
+多个用户之间可以协作
+与服务器大量交互，或者使用了WebSocket
+View要从多个来源获取数据
+```
+当然啦，本篇章讲述的例子是不需要用到 Redux 这一套状态管理工具的，但为了讲解就需要简单的例子来说明
+> 用一个简单的例子来深入浅出的理解 Redux的设计思想：
+一个简单的加减器，点击加号加一，点击减号减一
 
 ![](./mdimg/img1.png)
 
->Webpack的工作方式是：把你的项目当做一个整体，通过一个给定的主文件（如：index.js），Webpack将从这个文件开始找到你的项目的
-所有依赖文件，使用loaders处理它们，最后打包为一个浏览器可识别的JavaScript文件。
+### 一、Redux 的工作流程 （快递思想）
 
 ![](./mdimg/img2.png)
 
+看图感觉有点乱，梳理一下就清楚了，首先对以上图几个名词做个解释，它们分别是干嘛用的，有什么功能
 
-### 项目构建，安装必要包
-
-clone `git@github.com:ZengTianShengZ/react-lesson.git`
-
-切到 在lesson-1 的根目录下执行以下命令，安装必要包
+#### 1、 Store（快递公司）
+Store 可以看成是一个容器，整个应用只能有一个 Store ，就好比整个应用只能指定京东快递公司来运货。
 ```
- npm install
- // 如果安装过 npm 淘宝镜像
- cnpm install
- // 如果是 Mac 需要权限
- sudo npm install
+import {createStore, combineReducers, applyMiddleware} from 'redux';
+const store = createStore(reducer);
 ```
+#### 2、 State （快递物件）
+State ：一状态下的数据，一时间点下的数据。Store对象包含所有数据，想要得到某个时间点的数据，就要
+对Store生成快照，得到一个数据集合，就叫做state。 `store.getState()`可以得到state。
+Redux规定一个State对应一个View，反之亦然。 就好比一个快递物件只能给对应的主人，不能给其他人。
+```
+import {createStore, combineReducers, applyMiddleware} from 'redux';
+const store = createStore(reducer);
+store.getState()
+```
+#### 3、Action （快递单）
+买家要买东西怎么办，当然要先下单啦。用户只能操作 View（比如对view进行点击），用户是接触不到State的，
+那State的变化对应View的变化，这就需要View通过一个Action对象来通知State的变化。就好比通过一个
+快递下单（发送一个Action），才有接下去的物流等一系列操作不是吗。
+Action是一个自定义对象，其中`type`属性是必现的
+```
+cost action = {
+  type:'btnClick',
+  msg:'信息字符串，不是必现'
+}
+```
+#### 4、store.dispatch() (给快递公司货单)
+store.dispatch() 是view发出Action的唯一方法，store.dispatch()接受一个Action对象，将他发出去。
+现在还没发货，只是把订单信息给京东快递而已，京东是自营企业，有自己的物流仓库和物流中心，搜到订单信息
+再根据订单来发货。
+```
+store.dispatch(action);
+```
+#### 5、Reducer （包装货物）
+Store 收到一个Action后，必须给出一个新的State，这样view才会发生变化，而新的State的计算过程就是
+Reducer来完成的。
+就想收到一个订单（Action）后，需要根据订单来选取货物，进行包装。
+Reducer是一个自定义函数，它接受Action和当前的State作为参赛，返回一个新的State
+```
+const reducer = (state=defaultState,action) =>{
+  switch (action.type) {
+  case 'btnClick':
+    return state + action.msg +'更新';
+  case '其他type':
+    return state + ‘其他action.msg’;
+  /*
+    可添加更多的 case type 来匹配不同的Action
+  */
+  default:
+    return state;
+  }  
+}
+```
+接下来 我们把这套处理订单的规则（Reducer）给快递公司（Store），以后有订单只需要根据这套规则来发货就行了
+```
+import { createStore } from 'redux';
+// store.dispatch 方法会触发 Reducer 的自动执行
+const store = createStore(reducer);
+```
+也许你会疑问那需要发送不同的 Action怎么办 ，没错就是增加订单规则就可以了，往 Reducer 里面增加 case ’type’的规则
 
-开发过程中你会用到以下命令进行打包编译:
-
-| lesson-1根目录下运行命令行       | 解释   |  
-| ------------- |:-------------:|  
-| webpack     | 该命令会默认找到根目录下 webpack.config.js 文件并运行|  
-| npm run dev     | 改命令会找到 根目录下的 package.json 文件 并运行 文件下的 scripts 下的 dev命令，其实也就执行 node server.js  |    
-| npm run hot  | 改命令是同上 其实是执行 node server.hot.js   |     
-| npm run build | 改命令是同上 ，会执行 webpack --config webpack.config.dist.js --progress --colors --watch -p|  ##
-
-### 一、 webpack  基础讲解
-
-> lesson-1 根目录下 执行 ‘ webpack ’ 命令
->执行该命令会执行 根目录下 webpack.config.js  ,其实这里是为了讲解 webpack 的工作原理和演示
-> 项目用的最多的是执行 webpack.config.hot.js 和 webpack.config.build.js 后面会做讲解
-
-webpack.config.js 大致流程图:
+#### 6、store.subscribe() （接受快递）
+当 State一旦发生变化，那么 store.subscribe() 就会监听到自动执行。 好比收到了快递（秒送，哈哈）
+那收到快递能干嘛呢，每错，就是在这里重新渲染 View 更新View咯。
+```
+let unsubscribe = store.subscribe(() =>
+  console.log(store.getState())
+  render（）{
+      更新view ！！！
+  }
+);
+// 也可以取消订阅（监听）
+unsubscribe();
+```
+#### 小结
 ![](./mdimg/img3.png)
 
+下面讲解 Redux 在 React下的应用 --  React-Redux
 
-#### 1、entry
+### 二、Redux 在 React下的应用 （React-Redux）
 
+如果使用第一节讲述的 Redux 的那一套状态管理方法来对 React进行数据管理，也是可以的，但就有些麻烦。
+比如咱们要在最后自己定义更新View
 ```
-entry: {
-        app: APP_FILE
+store.subscribe(() =>
+  console.log(store.getState())
+  render（）{  // React 的 render（）方法
+      更新view ！！！
+  }
+);
+```
+为了使用方便，Redux的作者封装了一个React专用的库 `React-Redux`
+
+#### 1、React-Redux
+React-Redux 将组件分为两大类，UI组件和容器组件。UI组件只负责UI的呈现，而容器组件用来管理数据和事件。
+那怎么把交互和UI联系起来呢，那就使用 React-Redux 提供的 connect 方法。
+
+#### 2、connect（）
+React-Redux 提供的 connect 方法。就是将 UI组件个容器组件联系起来，那规则是什么呢？
+需要有：
+```
+输入逻辑：外部数据（state对象）转为 UI组件的参数
+输出逻辑：用户发出的动车 （Action对象）从UI组件传递出去
+```
+因此，connect方法的API是这样的：
+```
+import { connect } from 'react-redux'
+
+const Comp = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(UI)
+```
+connect方法接受两个参数：mapStateToProps 和 mapDispatchToProps ，前者负责输入逻辑，将state映射到
+UI组件的参数 props ，后者负责输出逻辑，将用户对UI的操作映射成Action。
+
+##### （1）、mapStateToProps（）
+mapStateToProps是一个函数，`建立一个 state对象到UI组件的props对象的映射关系！`是映射到UI组件的props
+对象上（关键点，多提醒一下，下面会做解释）。
+```
+const mapStateToProps = (state) => {
+    return {
+        count: state.count
     }
-```
-
-指定一个入口文件,webpack将会顺藤摸瓜识别所依赖的文件,再一个个进行接下去的解析处理
-
-#### 2、output
-
-```
-output: {
-        publicPath: './static/',     //编译好的文件，在服务器的路径,这是静态资源引用路径
-        path: BUILD_PATH,            //编译到当前目录
-        filename: '[name].js',       //编译后的文件名字
-        chunkFilename: '[name].[chunkhash:5].min.js',
-    },
-```
-
-指定一个出口路径,当webpack处理完依赖文件后,将输出文件输出到指定路径下
-其中:
-> filename: '[name].js'
-
-指输出 js 文件名 同 entry: 的输入文件名的配置一样,这里是会输出 app.js
-
-> chunkFilename: '[name].[chunkhash:5].min.js'
-
-会对输出的文件添加后缀 , 一个5位的 hash 值
-
-#### 3、devtool
-
-```
-devtool: 'cheap-module-eval-source-map',
-```
-
-除了输出编译后的文件外,还会顺带输出一个 Source Map 。什么是 Source Map呢，Source map就是一个信息文件，里面储存着位置信息。也就是说，转换后的代码的每一个位置，所对应的转换前的位置。如转码后的 ES6文件或 React的jsx文件 当代码出错我们很难找到对应的出错位置，那
-Source Map 就提供了一个对应关系，来指出错误的位置。
-
-#### 4、resolve
-
-```
-resolve: {
-        extensions: ['', '.js', '.jsx', '.less', '.scss', '.css'], //后缀名自动补全
-    }
-```
-这个配置可以帮我们自动补全后缀名，当我们 import 一个 demo.js 时可以这么写不带后缀的
-
->import demo from 'demo';
-
-#### 5、module
-```
-module: {
-      loaders: [{
-          test: /\.scss$/,
-          exclude: /^node_modules$/,
-          loader: ExtractTextPlugin.extract('style', ['css', 'autoprefixer', 'sass']),
-          include: [APP_PATH]
-      },{
-          test: /\.js$/,
-          exclude: /^node_modules$/,
-          loader: 'babel',
-          include: [APP_PATH]
-      },{
-          test: /\.(png|jpg)$/,
-          exclude: /^node_modules$/,
-          loader: 'url-loader?limit=8192&name=images/[hash:8].[name].[ext]',
-          //注意后面那个limit的参数，当你图片大小小于这个限制的时候，会自动启用base64编码图片
-          include: [APP_PATH]
-      }, {
-          test: /\.jsx$/,
-          exclude: /^node_modules$/,
-          loaders: ['jsx', 'babel'],
-          include: [APP_PATH]
-      }]
-  },
-```
-webpack 的核心部分就是各种 loader 了 ，webpack 拿到入口文件，并顺藤摸瓜解析到各种依赖文件，遇到不同的文件后缀就执行对应的loader进行处理
-其中
-> test: /\.scss$/,
-
-当依赖文件有以 .scss 后缀的文件，会先执行 sass-loader 再 执行 autoprefixer-loader（给一些css3添加后缀的loader）
-接着执行 css-loader ，这才转化成立 .css 文件，才能作用于浏览器，而 style-loader 是将 .css 文件插入到 html的 head 头部
-也许你会注意到 ExtractTextPlugin() 包裹一堆loader是干嘛的，这个放着下面 webpack的插件这一节讲
-
-> test: /\.js$/,
-
-当依赖文件有以 .js 后缀的文件 ，会经过 loader: 'babel', 这里多做了一步跳转是 babel会找到根目录下咱们配置的一个 .babelrc文件
-```
-{
-  	"presets": [
-  		"react",
-  		"es2015",
-  	 	"stage-0",
-  	],
-  	"plugins": [
-        "transform-decorators-legacy",
-        "transform-class-properties"
-    ]
-}
-```
-.js 文件会根据上面的配置进行解析
-
-> test: /\.(png|jpg)$/,
-
-```
-{
-    test: /\.(png|jpg)$/,
-    exclude: /^node_modules$/,
-    loader: 'url-loader?limit=8192&name=images/[hash:8].[name].[ext]',
-    //注意后面那个limit的参数，当你图片大小小于这个限制的时候，会自动启用base64编码图片
-    include: [APP_PATH]
-}
-```
-图片干嘛需要 loader呢，上面也解释了 可以将一个较小的图片进行 base64转换
-
-> test: /\.jsx$/,
-React 独有的 .jsx 文件 ，相对 .js文件多了一步 jsx-loader
-
-#### 6、plugins
-```
-plugins: [
-        new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: JSON.stringify('development')    //定义编译环境
-            },
-            'cdnUrl':JSON.stringify('http:demo.com/'),
-            'dev': true
-        }),
-        new HtmlWebpackPlugin({                            //根据模板插入css/js等生成最终HTML
-            filename: '../index.html',                     //生成的html存放路径，相对于 path
-            template: './src/template/index.html',         //html模板路径
-            hash: false,
-        }),
-        new ExtractTextPlugin('[name].css')
-    ],
-```
-其中：
-> DefinePlugin
-
-```
-plugins: [
-        new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: JSON.stringify('development')    //定义编译环境
-            },
-            'cdnUrl':JSON.stringify('http:demo.com/'),
-            'dev': true
-        })
-    ]
-```
-定义一下全局变量，可以在模块中使用这些变量
-如一个项目中依赖的 demo.js 文件
-```
-console.log(cdnUrl);
-```
-编译后的 demo.js 输出：
-```
-console.log(‘http:demo.com/’);
-```
-这个全局变量有什么作用呢，如果你有点项目经验就知道这个 plugin 的巨大好处了，举个小例子，咱们在项目开发时，线上环境
-和开发环境是不一样的，比如 cdn资源路径，就可以定义全局变量来更改全局路径资源：
-```
-if(dev){ // dev 是 DefinePlugin 的一个全局变量
-
-}else{
-
-}
-```
-
-> HtmlWebpackPlugin
-
-```
-plugins: [
-        new HtmlWebpackPlugin({                     //根据模板插入css/js等生成最终HTML
-            filename: '../index.html',              //生成的html存放路径，相对于 path
-            template: './src/template/index.html',  //html模板路径
-            hash: false,
-        })
-    ],
-```
-
-依赖文件经过 webpack 编译完输出到指定的目录下 ，那怎么被 html 引用呢，那就需要 HtmlWebpackPlugin 插件。
-用法上面有注释就不多说。
-
-> ExtractTextPlugin
-
-```
-plugins: [
-        new ExtractTextPlugin('[name].css')
-    ],
-```
-我们会在 .js 文件 import .css 或 .scss 文件，webpack 编译 .js 文件时会将这个css文件打包进了 js文件里头。
-但有时我们的 css文件比较大或想单独拿出来，那就可以利用这个插件 ExtractTextPlugin ，目的是生成单独的一份 css
-文件，而不是打包到 .js 文件里头
-
-编译前：
-
-![](./mdimg/img5.png)
-
-编译后：
-
-![](./mdimg/img6.png)
-
-
-### 二、开发环境下的 webpack -- 热刷新
-
-在实际开发中不可能编译一下webpack 在浏览器刷新看一下结果，编辑完再编译一下webpack，再刷新浏览器看一下效果。这样工作效率非常低
-也很不爽。
-下面咱们就来构建一套实际开发时的 webpack 来构建项目。webpack 的配置整体上跟第一节讲的差不多，主要在热部署上多做些处理而已。
-
-#### 1、启动热刷新
-与第一节不同的是，我们不是通过命令行 `webpack` 来启动编译，而是通过一个service服务 。可以在lesson-1 根目录下执行命令
-
-> npm run hot  或  node server_hot.js  // 其实 npm run hot 也是找的跟目录下的 package.json 执行 node server_hot.js 的
-
-执行完命令 试着改变一样 js文件或scss文件保存一下，发现浏览器页面是自动刷新的。但 build 目录下却不见得有任何输出。
-这是因为我们使用了 热刷新 的一个`中间件` ，每次保存完文件会自动编译项目中依赖的 js 和 css 文件，编译完的输出文件输出到
-`计算机的内存中` 这样在开发的过程中不用每次读写硬盘，速度也会快很多
-
-#### 2、中间件 webpack-dev-middleware
-上面第一小点提到一个`中间件`，那这个中间件到底怎么工作的呢，会使得咱们在开发过程中热刷新。或者说 执行命令行 `npm run hot`后
-都做了哪些。下面一幅图带你理解：
-![](./mdimg/img7.png)
-
-#### 3、 npm run hot
-运行命令行 `npm run hot` 其中就是执行 `server_hot.js` 这个文件，启动一个 server ，里面涉及到 nodejs的一些知识和Node.js Express 框架 ，对这一块不太熟悉的可以看这里 [Node.js 教程| 菜鸟教程](http://www.runoob.com/nodejs/nodejs-express-framework.html)
-
-##### （1）、分析 server_hot.js
-```
-var webpack = require('webpack');
-var express = require('express');
-var config = require('./webpack.config.hot');
-
-var app = express();
-var compiler = webpack(config);
-
-app.use(require('webpack-dev-middleware')(compiler, {
-	publicPath: config.output.publicPath,
-	hot: true,
-	historyApiFallback: true,
-	inline: true,
-	progress: true,
-	stats: {
-	colors: true,
-	}
-}));
-
-app.use(require('webpack-hot-middleware')(compiler));自动刷新的消息通知依靠的是浏览器和服务器之间的web socket连接
-
-//将其他路由，全部返回index.html
-app.get('*', function(req, res) {
-	res.sendFile(__dirname + '/index.html')
-});
-
-app.listen(8088, function() {
-	console.log('正常打开8088端口')
-});
-
-```
-
-##### （2）、看一下下面例子解释一下 app.use（）
-
-
-```
-var express = require('express');
-var app = express();
-app.use(function (req, res, next) {   // 没指定路径默认是 app.use('/',function(){}) 访问根路径                                                    //会进入这个函数
-  console.log('Time:', Date.now());
-  next();
-});
-```
-也就是 当 服务端接收到一个请求时，会先被 app.use（）拦截下，因为 app.use（）没有指定路径，默认接收根路径，
-如 访问 http://127.0.0.1:8088/ ，那么网络请求就会先被app.use（）拦截下。
-
-app.use（）处理完事情就会交给 下面的 get 或 post 请求了：
-```
-//将其他路由，全部返回index.html
-app.get('*', function(req, res) {
-	res.sendFile(__dirname + '/index.html')
-});
-```
-这里 get 收到请求后就给浏览器一个 响应（response） `res.sendFile()` 对浏览器输出 index.html
-
-##### （3）、看一下 webpack-dev-middleware 中间件
-
-```
-app.use(require('webpack-dev-middleware')(compiler, {
-	publicPath: config.output.publicPath,
-	hot: true,
-	historyApiFallback: true,
-	inline: true,
-	progress: true,
-	stats: {
-	colors: true,
-	}
-}));
-```
-上面一小点说到了 app.use 会收到请求后先做一些处理 ，处理内容就是 webpack-dev-middleware 来完成,
-这也是热更新的关键。自动刷新的消息通知依靠的是浏览器和服务器之间的 `web socket` 连接. 当保存一下文件（command+s或Ctrl+s）
-浏览器就会通过 连接 向服务端发送请求，服务端接收请求后 先被 app.use（）拦截下来，经过 webpack-dev-middleware 中间件
-处理,处理完 交给 app.get（）输出 index.html 到浏览器，至此，浏览器自动刷新完成！
-
-其中 webpack-dev-middleware 中间件 接收两个参数，一个是 `webpack(config)` 这就是用于编译 js css 的配置文件了，咱们在第一大节已经介绍了，里面的内容跟第一大节差不多，几处修改后面会解释。第二个参数是一个配置对象 具体看[github-webpack-dev-middleware](https://github.com/webpack/webpack-dev-middleware)
-
-##### （4）、 最后看一下 webpack-hot-middleware
-
-```
-app.use(require('webpack-hot-middleware')(compiler));
-```
-如果一些文件的小改动比如 改变一个 div 的颜色啊，都有经过一大堆的编译那效率就太低了，所以 webpack-hot-middleware 可以对一些小
-改动快速刷新浏览器，配合 webpack-dev-middleware 使用。
-
-### 4、 热跟新的配置文件 webpack.config.hot.js
-这个配置文件其实跟第一大节讲的并无太大区别，只不过要配合热刷新需要新添加如下配置：
-entry 添加 webpack-hot-middleware/client
-```
-entry: {
-    app: [
-        'webpack-hot-middleware/client',
-        APP_FILE
-    ]
-},
-```
-plugins 添加如下：
-```
-plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin()
-]
-```
-
-### 三、 线上环境下的 webpack
-
-一般呢，项目开发完要发布到服务器，是需要配合另一套的项目打包流程的，发布到服务器的项目是不需要热更新等一些辅助开发的流程，
-但同时根据项目的情况需要加入一些比如 压缩代码，抽离公共代码，异步加载js 等 需求。下面配合打包线上项目的 `webpack.config.build.js`
-来说一下如何打包线上项目的。
-
-#### 1、npm run build
-
-在lesson-1 根目录下运行命令 `npm run build` ，根目录会输出以下文件：
-
-![](./mdimg/img8.png)
-
-运行命令 `npm run build` 是找到 根目录下的 package.json 文件执行 scripts 下的 build命令，其实就是执行：
-```
-"build": "webpack --config webpack.config.build.js --progress --colors --watch -p"
-```
-> --config webpack.config.build.js 指定 命令执行的文件
-> --progress 指定在控制台输出进度条
-> --colors  控制台显示颜色
-
-#### 2、分析 webpack.config.build.js
-```
-var path = require('path');
-var webpack = require('webpack');
-var ExtractTextPlugin = require('extract-text-webpack-plugin'); //css单独打包
-var HtmlWebpackPlugin = require('html-webpack-plugin'); //生成html
-
-//定义地址
-var ROOT_PATH = path.resolve(__dirname);
-var APP_PATH = path.resolve(ROOT_PATH, 'src');              //__dirname 中的src目录，以此类推
-var APP_FILE = path.resolve(APP_PATH, 'app');               //根目录文件app.jsx地址
-var BUILD_PATH = path.resolve(ROOT_PATH, './build/static'); //发布文件所存放的目录/pxq/dist/前面加/报错？
-
-module.exports = {
-    entry: {
-        app: APP_FILE,
-        common: [
-            "react",
-            'react-dom',
-            'react-router',
-            'redux',
-            'react-redux',
-            'redux-thunk',
-            'immutable'
-        ]
-    },
-    output: {
-        //publicPath: 'http:example.cdn/',   // 给资源文件添加前缀，一般会把静态资源发布的 cdn 上
-        path: BUILD_PATH,                    //编译到当前目录
-        filename: '[name].js',               //编译后的文件名字
-        chunkFilename: '[name].[chunkhash:5].min.js',
-    },
-    resolve: {
-        extensions: ['', '.js', '.jsx', '.less', '.scss', '.css'] //后缀名自动补全
-    },
-    module: {
-        loaders: [{
-            test: /\.js$/,
-            exclude: /^node_modules$/,
-            loader: 'babel'
-        }, {
-            test: /\.css$/,
-            exclude: /^node_modules$/,
-            loader: ExtractTextPlugin.extract('style', ['css', 'autoprefixer'])
-        }, {
-            test: /\.less$/,
-            exclude: /^node_modules$/,
-            loader: ExtractTextPlugin.extract('style', ['css', 'autoprefixer', 'less'])
-        }, {
-            test: /\.scss$/,
-            exclude: /^node_modules$/,
-            loader: ExtractTextPlugin.extract('style', ['css', 'autoprefixer', 'sass'])
-        }, {
-            test: /\.(eot|woff|svg|ttf|woff2|gif|appcache)(\?|$)/,
-            exclude: /^node_modules$/,
-            loader: 'file-loader?name=[name].[ext]'
-        }, {
-            test: /\.(png|jpg|gif)$/,
-            exclude: /^node_modules$/,
-            loader: 'url-loader?limit=8192&name=images/[hash:8].[name].[ext]',
-            //注意后面那个limit的参数，当你图片大小小于这个限制的时候，会自动启用base64编码图
-        }, {
-            test: /\.jsx$/,
-            exclude: /^node_modules$/,
-            loaders: ['jsx', 'babel']
-        }]
-    },
-    plugins: [
-        new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: JSON.stringify('production') //定义生产环境
-            }
-        }),
-        new HtmlWebpackPlugin({                    //根据模板插入css/js等生成最终HTML
-            filename: '../index.html',             //生成的html存放路径，相对于 path
-            template: './src/template/index.html', //html模板路径
-            inject: 'body',
-            hash: true,
-        }),
-        new ExtractTextPlugin('[name].css'),
-        //提取出来的样式和common.js会自动添加进发布模式的html文件中，原来的html没有
-        new webpack.optimize.CommonsChunkPlugin("common", "common.bundle.js"),
-        new webpack.optimize.UglifyJsPlugin({
-            output: {
-                comments: false, // remove all comments （移除所有注释）
-            },
-            compress: {          // 压缩
-                warnings: false
-            }
-        })
-    ]
 };
 ```
-与前面讲的第一大节相比，并无明显区别，主要是加了一些将项目发布到服务的线上流程。
-其中：
-##### （1）、entry
+mapStateToProps 接受参数state，state的字段（state.count）赋值给 count 属性，而count属性是UI组件的
+同名参数。
+mapStateToProps会定义 Store，每当 state更新就会自动执行这个方法，那自动执行这个方法怎么就会更新UI呢，
+UI更新一个来自自身的 `this.state` 变化，还有一个来自 `this.props`变化都会触发React组件重新render（），
+而 就上面例子 mapStateToProps 接受 state 的变化从而返回一个 赋值 count属性，而这个属性是对应UI组件的
+props对象的映射，props变化自然会带动UI组件的更新。
+
+##### (2)、mapDispatchToProps()
+mapDispatchToProps 是 connect的第二个参数，也是一个函数（还可以是一个对象）。mapDispatchToProps作为函数，
+应该返回一个对象，该对象的每个键值对都是一个映射，定义了 UI 组件的参数怎样发出 Action。又是一个映射到UI组件的
+props参数上！！！
 ```
-entry: {
-    app: APP_FILE,
-    common: [
-        "react",
-        'react-dom',
-        'react-router',
-        'redux',
-        'react-redux',
-        'redux-thunk',
-        'immutable'
-    ]
-},
+const mapDispatchToProps = (dispatch, ownProps) => {
+    return {
+        increase: (...args) => dispatch(actions.increase(...args)),
+        decrease: (...args) => dispatch(actions.decrease(...args))
+    }
+};
 ```
-添加了 common 用来单独打包出公共部分的 js代码
+上面 mapDispatchToProps函数接受两个参数，返回一个对象，注意返回对象的属性是对应UI组件的props参数的。
+也就是UI组件怎么派发一个Action呢，那就是 UI组件调用 `props.increase`  就会执行 dispatch（Action）
+操作，从而派发一个Action。
 
-##### （2）、plugins
-
+#### 3、<Provider> 组件
+上面多次提到 属性映射到props组件上，子组件在通过props拿到数据或方法进行操作，那props对应的组件是谁呢，
+也就是子组件的父组件是谁呢。
+React-Redux 就提供了<Provider> 组件 来充当所有UI组件的容器组件，所有UI组件都可以利用props属性想
+<Provider> 组件拿数据。而<Provider> 组件的数据由 store提供。
 ```
-plugins: [
-    new ExtractTextPlugin('[name].css'),
-    new webpack.optimize.CommonsChunkPlugin("common", "common.bundle.js"),
-    new webpack.optimize.UglifyJsPlugin({
-        output: {
-            comments: false, // remove all comments （移除所有注释）
-        },
-        compress: {          // 压缩
-            warnings: false
-        }
-    })
-]
+render(
+    <Provider store={store}>
+        <Index></Index>
+    </Provider>,
+    document.body.appendChild(document.createElement('div'))
+);
 ```
-webpack.config.build.js 新添了几个 plugins 。首先要清楚的一点是 webpack 是将一块块的依赖打包的一个文件里头的，
-不管是 js 、scss、less、css、jsx 文件都会编译成一块块的代码打包到一个文件里头。那插件可以将一块块的代码看是压缩或提取出来
-`ExtractTextPlugin` 插件的作用就是将 css块区域的代码单独提取出来的。
-`CommonsChunkPlugin` 是用来提取公用的代码块。有两个参数 `common` 是对应 entry 的字段，`common.bundle.js`是将
-公共代码输出到 `common.bundle.js` 文件里。
-`UglifyJsPlugin` 是将打包后的代码镜像压缩。
 
-### 总结
+#### 小结
+由下图可以看出 React-Redux 的大致工作原理，可以看出UI组件确实只负责UI部分，只通过props参数拿数据和对外
+派发数据，而没有多做业务上的逻辑。而业务逻辑和数据呈现交给了容器组件，UI组件和容器组件是通过 connect（）
+方法链接的，内部是通过 mapStateToProps 和mapDispatchToProps进行数据传递的。整个应用的数据都会经过
+Store这个中央处理器的处理。所以不同UI组件之间的数据交互可以把数据都丢给Store这个中央处理器处理，Store
+再把处理好的数据回传给各个UI组件就可以了
+ ![](./mdimg/img4.png)
 
-lesson-1 主要是对 webpack 打包编译的一些讲解和梳理。
-- 第一节讲了 webpack 的简单工作原理，                               // webpack
-- 第二节讲了 实际开发过程中 支持浏览器自动刷新，对webpack进行相应的改造， // npm run hot
-- 第三节讲了 将项目发布到线上的一些实际打包的工作流程。                 // npm run build
+ ### 三、小例子：加减器
 
-后面还有 lesson 来讲解 React 配合 Redux、 Router 在实际项目中的应用和开发，喜欢的话可以先 `star` 一下哦！！！
+ ![](./mdimg/img1.png)
+
+ 用一段代码来巩固前面所学习的知识。实践强化嘛！哈哈
+
+ Main.jsx:
+ ```
+ import React, {Component, PropTypes} from 'react';
+ import {connect} from 'react-redux';
+
+ /**
+ * 定义一个 Main组件
+ */
+ class Main extends Component{
+     constructor(){
+         super();
+         this.pClick =() =>{
+             console.log('sssssssss');
+         };
+         this.state = {
+             num:0,
+             age:666
+         }
+     }
+     render(){
+         // 拿到 this.props 参数
+         const {count, increase, decrease} = this.props;
+         return(
+             <div>
+                 <p className="lesson-2">React lesson-2</p>
+                 <p>
+                     ---------------------------------
+                 </p>
+                 <div className="count">
+                     <div>计数：{this.props.count}次</div>
+                     <span className="btn" onClick={increase}>+</span>
+                     <span className="btn" onClick={decrease}>-</span>
+                 </div>
+             </div>
+         )
+     }
+ }
+ /**
+ * 用来给 组件传递数据
+ * @param state
+ */
+ const mapStateToProps = (state) => {
+     return {
+         count: state.count
+     }
+ };
+ /**
+ *用来组件给 容器组件派发数据
+ * @param dispatch 派发 Action
+ * @param ownProps 组件自身的 props参数
+ */
+ const mapDispatchToProps = (dispatch, ownProps) => {
+     return {
+         increase: (...args) => dispatch(actions.increase(...args)),
+         decrease: (...args) => dispatch(actions.decrease(...args))
+     }
+ };
+ /**
+ * actions
+ */
+ const actions ={
+     increase:() => {
+       return {type: 'INCREASE'}
+     },
+     decrease: () => {
+       return {type: 'DECREASE'}
+     }
+ };
+ /**
+ * 连接 UI组件 和 容器组件
+ * @param mapStateToProps     输入逻辑
+ * @param mapDispatchToProps  输出逻辑
+ */
+ const Comp = connect(mapStateToProps, mapDispatchToProps)(Main);
+ /**
+ *  输出一个容器组件
+ */
+ export default Comp;
+```
+App.js
+```
+import React,{Component,PropTypes} from 'react';
+import ReactDOM, {render} from 'react-dom';
+import {Provider,connect} from 'react-redux';
+import {createStore, combineReducers, applyMiddleware} from 'redux';
+import Index from './Component/Main.jsx';
+import './Style/comm.scss'
+
+const store = createStore(reducer);
+//监听state变化
+store.subscribe(() => {
+    //console.log(store.getState())
+});
+const reducer = (state = {count: 0}, action) => {
+    switch (action.type){
+        case 'INCREASE': return {count: state.count + 1};
+        case 'DECREASE': return {count: state.count - 1};
+        default: return state;
+    }
+}
+render(
+    <Provider store={store}>
+        <Index></Index>
+    </Provider>,
+    document.body.appendChild(document.createElement('div'))
+);
+```
+
+你也可以 clone本项目运行调试
+```
+clone git@github.com:ZengTianShengZ/react-lesson.git
+cd lesson-2
+npm install
+npm run hot
+```
+
+## 总结
+
+以上是对 Redux 的学习和体会，很多资料来源于网上和大神的博客，如有疑问的话可以 issue，
+觉得有帮助的话可以 `star` 一下本项目哦 ^-^
