@@ -99,7 +99,9 @@ output: {
 
 > chunkFilename: '[name].[chunkhash:5].min.js'
 
-会对输出的文件添加后缀 , 一个5位的 hash 值
+chunkFilename的解释 多谢一位同学的提醒,使用场景是对js文件进行按需加载时，会对输出的文件添加后缀 ,
+ 文件名加一个5位的 hash 值, 如果不配置 chunkFilename 的话会自定给 [name] 随便一个id如‘2aj32’，
+ 可读性就比较差。配合 react-router 可以查看效果。
 
 #### 3、devtool
 
