@@ -3,16 +3,15 @@ import {History, Link } from 'react-router';
 import {connect} from 'react-redux';
 import { is, fromJS} from 'immutable';
 import template from './common/template'
-/**
-*  page2 组件
-*/
+/*=================
+  Page2.jsx 子组件
+==================*/
 class Page2 extends Component{
     constructor(){
         super();
     }
     render(){
         const {fData} = this.props;
-        console.log('???????');
         let items;
         if(fData.data.data){
              console.log(fData);
@@ -60,6 +59,6 @@ class ListItem extends Component{
 }
 export default template({
   id:'',
-  url:'http://news-at.zhihu.com/api/4/news/latest',
+  url:'/getData',
   component:Page2
 })

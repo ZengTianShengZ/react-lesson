@@ -1,8 +1,8 @@
+// import Immutable from 'immutable'
 /*=================
     reducer.jsx
+接收Action 并作出处理
 ==================*/
-// import Immutable from 'immutable'
-
 export const increaseData =  (state ={count:0}, action={}) => {
     switch (action.type){
               case 'INCREASE':

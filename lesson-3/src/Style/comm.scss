@@ -1,3 +1,6 @@
+/*=================
+      样式表
+==================*/
 body,html{
   margin: 0;
 
@@ -19,15 +22,21 @@ h1,p{
   color: #232323;
   padding: 20px;
 }
+/*  index 组件
+******************************/
 #IndexView{
   border: 1px solid #ffffff;
 }
+/*  index 的 Botton 子组件
+******************************/
 #BottonView{
   width: 100%;
   margin-top: 20px;
   border: 1px solid #ffffff;
   text-align: center;
 }
+/*  Page2 组件
+******************************/
 #Page2{
   background: #f1f1f1;
   text-align: center;
@@ -49,6 +58,8 @@ h1,p{
 }
 .link_page2{
 }
+/*  Page2 的 ListItem子组件
+******************************/
 #ListItem{
   padding: 20px;
   margin: 20px 0;

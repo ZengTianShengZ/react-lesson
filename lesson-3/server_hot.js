@@ -18,7 +18,10 @@ app.use(require('webpack-dev-middleware')(compiler, {
 
 app.use(require('webpack-hot-middleware')(compiler));
 
-
+/**
+* get： 请求
+* url： http://127.0.0.1:8088/getData
+*/
 app.get('/getData',function(req,res){
 	  var resData = {
 			err:0,
@@ -26,7 +29,9 @@ app.get('/getData',function(req,res){
 		}
 		res.end(JSON.stringify(resData));
 })
-//将其他路由，全部返回index.html
+/**
+* 将其他路由，全部返回index.html
+*/
 app.get('/*', function(req, res) {
 	res.sendFile(__dirname + '/index.html')
 });
