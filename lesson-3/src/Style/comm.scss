@@ -1,0 +1,62 @@
+body,html{
+  margin: 0;
+
+}
+h1,p{
+  text-align: center;
+}
+.lesson-3{
+  font-size: 22px;
+}
+.count{
+  font-size: 20px;
+  text-align: center;
+}
+.count .btn{
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  color: #232323;
+  padding: 20px;
+}
+#IndexView{
+  border: 1px solid #ffffff;
+}
+#BottonView{
+  width: 100%;
+  margin-top: 20px;
+  border: 1px solid #ffffff;
+  text-align: center;
+}
+#Page2{
+  background: #f1f1f1;
+  text-align: center;
+  padding: 20px;
+
+}
+.page-head{
+  padding: 10px;
+  background: #ffffff;
+
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+
+}
+.test-data{
+  span{
+    margin: 0 20px;
+    color:red;
+  }
+}
+.link_page2{
+}
+#ListItem{
+  padding: 20px;
+  margin: 20px 0;
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  .item-img{
+    margin: 0 auto;
+    width: 200px;
+    height: 200px;
+  }
+}
