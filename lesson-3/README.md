@@ -1,14 +1,20 @@
-## lesson-3 项目开发模板
+## lesson-3 构建 React 项目开发模板
 
 ### 前言：
 在 `lesson-1 :构建一套适合 React、ES6 开发的脚手架`,`lesson-2 : Redux 的设计思想`,
-我们已经对利用 React 来构建项目有了一些基础知识，那推出 `lesson-3 ：项目开发模板` 是为了在
+我们已经对利用 React 构建项目有了一些基础知识，那推出 `构建 React 项目开发模板` 是为了在
 实际的项目中有一套完善的体系或机制来迎合我们实际的开发需求，比如在 lesson-2 中，虽然我们已经
-能让项目带着 Redux 这么一个数据状态管理机器给运转起来了，那 lesson-3 就是来做进一步封装的，使开发
-更加清爽，项目也更加容易迭代和维护。
+能让项目带着 Redux 这么一个数据状态管理机器给运转起来了，那 lesson-3 就是对 React 结合
+react-redux 进一步封装，使开发更加清爽，项目也更加容易迭代和维护。
+
+先看一下本项目封装完的一个案例：
+![](./mdimg/demo3.gif)
+
+### 前言2：
+如果对下面知识点的补充不是很熟悉，可以先看前篇我写的内容 [lesson-2 : Redux 的设计思想](https://github.com/ZengTianShengZ/react-lesson/blob/master/lesson-2/README.md)
 
 ### 我们还需要一些中间件
-我们还需要一些好用的中间件
+在封装项目的过程中，我们还需要一些好用的中间件来支持我们的封装。
 #### 1、combineReducers
 `combineReducers` 函数是用来对 reducer 函数进行拆分的。我们在 reducer 函数里进行case 多条来着
 Action 派发过来的数据，并返回 State ，但在项目复杂，数据一多的情况下，在一个reducer 函数里面处理
@@ -103,8 +109,8 @@ connect(mapStateToProps, action)(Index);
 
 #### 1、Fetch 网络请求插件
 Fetch标准定义了请求，响应和绑定它们的进程 。也许你会想，网络请求不是有 Ajax，自己封装一个不就好了，或者jQuery的
-$.ajax不是很流行很好用了吗。但基于事件的异步请求在多任务的处理中还是很不方便的。一堆请求一堆callback
-Fetch API 是基于 Promise设计的，这样极大的好处是，请求到数据不用使用层层回调，可以用链式操作的方式处理我们的数据。
+$.ajax不是很流行很好用了吗。但基于事件的异步请求在多任务的处理中还是很不方便的。Fetch API 是基于 Promise设计的，
+这样极大的好处是，请求到数据不用使用层层回调，可以用链式操作的方式处理我们的数据。
 还不是很清晰的话可以[点开这个链接看看](https://github.com/camsong/blog/issues/2)
 结合 React 的使用：
 ```
@@ -139,7 +145,7 @@ export const fetchData = (url ,data) => {
 immutable 不可变的意思。都知道 React 的state或子组件的props数据一变化，那就会触发组件重新 render ，
 那变化的 props 假如跟其他组件没关系，但其他组件也会受到影响逼自己重新render，那岂不就耗性能了。
 immutable.js 就是将普通JS对象和数组转换为不可变的Map和List集合。对 js 数据做深层比较，如果没变化就
-不对组件进行 render 。这里只是给大家提有这么一个概念，具体内容请Google
+不对组件进行 render 。这里只是给大家提有这么一个概念，可以在大型的React项目中使用，具体内容请Google
 
 
 ### 怎么封装我们的 React 项目
@@ -166,6 +172,7 @@ npm run hot
 ## 总结：
 lesson-3 主要是延续了 lesson-2 的内容，对结合 react-redux 的React项目做了封装，让React在
 实际项目开发中更加清爽，项目也更加容易维护。为此也介绍了一些新的知识点 combineReducers 和 redux-thunk
-中间件，以及好用的网络请求 Fetch 工具类
+中间件，以及好用的网络请求 Fetch 工具等。
+
 至此，react项目构建三部曲 告一段落 ，有不足的地方还请大家 issue ，欢迎 `star`
 本人也在继续努力的学习中，会让这个项目更加完善，谢谢！

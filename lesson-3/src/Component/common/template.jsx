@@ -51,11 +51,12 @@ const Main = mySetting => {
        拿到 reducer 给过来的数据
    */
    const mapStateToProps = (state) => {
-     let {fData ,increaseData ,decreaseData} = state;
+     let {fData,loading ,increaseData ,decreaseData} = state;
        return {
            increaseData:increaseData,
            decreaseData,
-           fData
+           fData,
+           loading
        }
    };
    /*

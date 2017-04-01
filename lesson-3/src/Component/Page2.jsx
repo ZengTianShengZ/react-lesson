@@ -3,6 +3,8 @@ import {History, Link } from 'react-router';
 import {connect} from 'react-redux';
 import { is, fromJS} from 'immutable';
 import template from './common/template'
+import Loading from './Loading'
+
 /*=================
   Page2.jsx 子组件
 ==================*/
@@ -21,6 +23,7 @@ class Page2 extends Component{
          }
         return(
             <div id='Page2'>
+                <Loading />
                 {/* <p>{fData.data.data.stories[0].title}</p> */}
                 <div className='page-head'>
                   <p className="lesson-3">page2 component</p>
@@ -47,7 +50,6 @@ class ListItem extends Component{
     }
     render(){
         let {title ,images ,index} = this.props;
-        console.log(images[0]);
         var imgUrl = {background:'url('+images[0]+') no-repeat center'}
         return(
             <div id='ListItem'>
