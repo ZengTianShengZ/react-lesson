@@ -17,9 +17,9 @@
 
 ### 前言：
 本项目分成了三部分对基于React框架的前端项目进行拆分学习，项目涉及webpack、react-redux、
-react-router得知识点。
+react-router等知识点。
 
-### 第一部分：构建一套适合 React、ES6 开发的脚手架
+### [第一部分：构建一套适合 React、ES6 开发的脚手架](https://github.com/ZengTianShengZ/react-lesson/blob/master/lesson-1/README.md)
 ```
 clone git@github.com:ZengTianShengZ/react-lesson.git
 cd lesson-1
@@ -31,7 +31,7 @@ npm run hot
 等到实际需要的时候再异步加载。通过 loader 的转换，任何形式的资源都可以视作模块，比如CommonJs 模块、
 AMD 模块、 ES6 模块、CSS、图片、 JSON、Coffeescript、 LESS 等。
 
-### 第二部分：Redux 的设计思想
+### [第二部分：Redux 的设计思想](https://github.com/ZengTianShengZ/react-lesson/blob/master/lesson-2/README.md)
 ```
 clone git@github.com:ZengTianShengZ/react-lesson.git
 cd lesson-2
@@ -42,7 +42,7 @@ Redux是什么呢？一个状态管理工具。那是干嘛用的呢？都知道
 中各个模块进行分割形成组件，而组件之间就避免不了事件的传递或数据的交互，那Redux就是用来对这些组件
 的状态进行管理的。就好比买家和卖家，快递是交给第三方（Redux）去完成。
 
-### 第三部分：构建 React 项目开发模板
+### [第三部分：构建 React 项目开发模板](https://github.com/ZengTianShengZ/react-lesson/blob/master/lesson-3/README.md)
 ```
 clone git@github.com:ZengTianShengZ/react-lesson.git
 cd lesson-3
