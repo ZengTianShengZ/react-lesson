@@ -24,10 +24,10 @@ module.exports = {
         ]
     },
     output: {
-      //  publicPath: '/build/static/', //编译好的文件，在服务器的路径,域名会自动添加到前面
+        //publicPath: '/build/static/', //编译好的文件，在服务器的路径,域名会自动添加到前面
         path: BUILD_PATH, //编译到当前目录
-        filename: '[name].js', //编译后的文件名字
-        chunkFilename: '[name].[chunkhash:5].min.js',
+        filename: 'js/[name].js', //编译后的文件名字
+        chunkFilename: 'js/[name].[chunkhash:5].min.js',
     },
     resolve: {
         extensions: ['', '.js', '.jsx', '.less', '.scss', '.css'] //后缀名自动补全
@@ -76,7 +76,7 @@ module.exports = {
             inject: 'body',
             hash: true,
         }),
-        new ExtractTextPlugin('[name].css'),
+        new ExtractTextPlugin('css/[name].css'),
         //提取出来的样式和common.js会自动添加进发布模式的html文件中，原来的html没有
         new webpack.optimize.CommonsChunkPlugin("common", "common.bundle.js"),
         new webpack.optimize.UglifyJsPlugin({

@@ -24,8 +24,10 @@ class BottonView extends Component{
         )
     }
     shouldComponentUpdate(nextProps, nextState){
+       console.log('BottonView component::::');
+       console.log(nextProps);
       // let randerFlag = !is(fromJS(this.props), fromJS(nextProps)) || !is(fromJS(this.state),fromJS(nextState))
-       return  true;
+       return  false;
     }
 }
 export default template({

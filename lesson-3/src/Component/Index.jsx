@@ -29,16 +29,20 @@ class Index extends Component{
                     <span className="btn" onClick={increase}>+</span>
                     <span className="btn" onClick={decrease}>-</span>
                 </div>
+                <div className='botton-img'></div>
                 <BottonView/>
             </div>
         )
     }
     shouldComponentUpdate(nextProps, nextState){
+      console.log('index component::::');
+      console.log(nextProps);
        return true;
     }
 }
 export default template({
   id:'index',
   url:'',
+  subscribeData:['increaseData','decreaseData'], // 对应组件所需要的 this.props 数据
   component:Index
 })

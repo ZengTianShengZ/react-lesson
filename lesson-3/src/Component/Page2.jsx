@@ -41,6 +41,7 @@ class Page2 extends Component{
         )
     }
     shouldComponentUpdate(nextProps, nextState){
+
        return  true;
     }
 }
@@ -62,5 +63,6 @@ class ListItem extends Component{
 export default template({
   id:'',
   url:'/getData',
+  subscribeData:['fData','increaseData','decreaseData'], 
   component:Page2
 })

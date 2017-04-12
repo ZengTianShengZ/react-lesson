@@ -3,7 +3,8 @@
 ==================*/
 body,html{
   margin: 0;
-
+  width: 100%;
+  height: 100%;
 }
 h1,p{
   text-align: center;
@@ -22,10 +23,22 @@ h1,p{
   color: #232323;
   padding: 20px;
 }
+#root{
+  width: 100%;
+  height: 100%;
+}
 /*  index 组件
 ******************************/
 #IndexView{
-  border: 1px solid #ffffff;
+  width: 100%;
+  height: 100%;
+  // border: 1x solid red;
+}
+.botton-img{
+  width: 90%;
+  height: 250px;
+  background: url('../image/t_img.png') no-repeat center;
+  margin: 0 auto;
 }
 /*  index 的 Botton 子组件
 ******************************/

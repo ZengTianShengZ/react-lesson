@@ -1,27 +1,21 @@
-var webpack = require('webpack');
-var WebpackDevServer = require('webpack-dev-server');
-var config = require('./webpack.config.dev');
+var express = require('express');
+var app = express();
 
-//代理服务器
-var proxy = [{
-	path: '/*/*', //必须得有一个文件地址，如果顶层文件夹名字不同，则用/*代替
-	target: 'http://dev.fe.ptdev.cn',
-	host: 'dev.fe.ptdev.cn',
-	secure: false
-}];
-var server = new WebpackDevServer(webpack(config), {
-	publicPath: config.output.publicPath,
-	progress: true,
-	stats: {
-		colors: true,
-	},
-	proxy
-});
-
-//将其他路由，全部返回index.html
-server.app.get('*', function(req, res) {
-	res.sendFile(__dirname + '/index.html')
-});
-server.listen(8088, function() {
-	console.log('正常打开8088端口')
-});
+app.use(express.static('build'))
+/**
+* get： 请求
+* url： http://127.0.0.1:8088/getData
+*/
+app.get('/getData',function(req,res){
+	  var resData = {
+			err:0,
+			data:dataJson
+		}
+		res.end(JSON.stringify(resData));
+})
+app.get('/', function (req, res) {
+	res.sendFile(__dirname + '/build/index.html')
+})
+var server = app.listen(8088, function () {
+	console.log('正常打开8088端口');
+})

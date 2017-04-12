@@ -14,5 +14,5 @@ render(
     <Provider store={store}>
       {router}
     </Provider>,
-    document.body.appendChild(document.createElement('div'))
+    document.getElementById('root')
 );

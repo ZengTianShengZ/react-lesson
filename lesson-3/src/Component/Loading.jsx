@@ -35,5 +35,6 @@ class LoadingView extends Component{
 export default template({
   id:'',
   url:'',
+  subscribeData:['fData'],
   component:LoadingView
 })
