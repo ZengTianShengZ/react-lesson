@@ -1,6 +1,6 @@
  import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
-// import {get, is, fromJS} from 'immutable';
+import {get, is, fromJS} from 'immutable';
 import  * as action from '../../Redux/action.jsx'
 /*=================
     template.jsx
@@ -44,8 +44,8 @@ const Main = mySetting => {
      */
      shouldComponentUpdate(nextProps, nextState){
        // immutable.js 深层次判断是否状态真的发生了变化
-      //  return !is(fromJS(this.props),fromJS(nextProps))||!is(fromJS(this.state),fromJS(nextState))
-          return true;
+         return !is(fromJS(this.props),fromJS(nextProps))||!is(fromJS(this.state),fromJS(nextState))
+         // return true;
      }
    }
    /*
@@ -56,8 +56,8 @@ const Main = mySetting => {
        // 参数 state 能得到所有reducer数据，但都返回给子组件那就会 对没产生数据变化的其他子组件触发render，耗性能
        // 所以采用 让子组件来订阅 它自身所需要的数据就好
        let subscribeData = {};
-       for(let pd of setting.subscribeData){
-          subscribeData[pd] = state[pd];
+       for(let sd of setting.subscribeData){
+          subscribeData[sd] = state[sd];
        }
        return subscribeData;
    };

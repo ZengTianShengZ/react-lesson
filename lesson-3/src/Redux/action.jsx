@@ -3,11 +3,11 @@ import fetch from 'isomorphic-fetch'
     action.jsx
     派发 action
 ==================*/
- export const increase = () => {
-   return {type: 'INCREASE'}
+ export const increase = data => {
+   return {type: 'INCREASE',data:data}
  }
- export const decrease = () => {
-   return {type: 'DECREASE'}
+ export const decrease = data => {
+   return {type: 'DECREASE',data:data}
  }
 
 const dispathData = (path,json) => {

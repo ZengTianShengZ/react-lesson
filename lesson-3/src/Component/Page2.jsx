@@ -29,8 +29,8 @@ class Page2 extends Component{
                   <p className="lesson-3">page2 component</p>
                   <div className='test-data'>
                     <p>来着index页面的 </p>
-                    <span>加数据:{this.props.increaseData.count}</span>
-                    <span>减数据:{this.props.decreaseData.count}</span>
+                    <span>加数据:{this.props.increaseData.get('count')}</span>
+                    <span>减数据:{this.props.decreaseData.get('count')}</span>
                   </div>
                   <Link className='link_page2' to='/'>link to index</Link>
                 </div>
@@ -63,6 +63,6 @@ class ListItem extends Component{
 export default template({
   id:'',
   url:'/getData',
-  subscribeData:['fData','increaseData','decreaseData'], 
+  subscribeData:['fData','increaseData','decreaseData'],
   component:Page2
 })

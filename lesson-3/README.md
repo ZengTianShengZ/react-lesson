@@ -143,10 +143,11 @@ export const fetchData = (url ,data) => {
 ```
 
 #### 2、immutable.js 优化React性能
-immutable 不可变的意思。都知道 React 的state或子组件的props数据一变化，那就会触发组件重新 render ，
-那变化的 props 假如跟其他组件没关系，但其他组件也会受到影响逼自己重新render，那岂不就耗性能了。
-immutable.js 就是将普通JS对象和数组转换为不可变的Map和List集合。对 js 数据做深层比较，如果没变化就
-不对组件进行 render 。这里只是给大家提有这么一个概念，可以在大型的React项目中使用，具体内容请Google
+immutable 不可变的意思。JavaScript 中的对象一般是可变的（Mutable），因为使用了引用赋值，
+新的对象简单的引用了原始对象，改变新的对象将影响到原始对象。如 foo={a: 1}; bar=foo; bar.a=2
+你会发现此时 foo.a 也被改成了 2。虽然这样做可以节约内存，但当应用复杂后，这就造成了非常大的隐患.
+特别在 React中，数据的改变会触发组件的重新 render。有了 immutable ，就可以对数据进行深度比较，
+对有真正改变数据的组件才进行 render（）. 更多内容可跳转该链接 [Immutable 详解及 React 中实践](https://github.com/camsong/blog/issues/3)
 
 
 ### 怎么封装我们的 React 项目
