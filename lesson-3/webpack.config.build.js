@@ -24,7 +24,7 @@ module.exports = {
         ]
     },
     output: {
-        //publicPath: '/build/static/', //编译好的文件，在服务器的路径,域名会自动添加到前面
+        publicPath: '/static/', //编译好的文件，在服务器的路径,域名会自动添加到前面
         path: BUILD_PATH, //编译到当前目录
         filename: 'js/[name].js', //编译后的文件名字
         chunkFilename: 'js/[name].[chunkhash:5].min.js',

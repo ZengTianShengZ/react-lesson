@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+var dataJson = require('./dataJson.json');
 
 app.use(express.static('build'))
 /**
