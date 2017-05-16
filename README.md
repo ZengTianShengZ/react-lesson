@@ -55,7 +55,7 @@ npm run hot
 能让项目带着 Redux 这么一个数据状态管理机器给运转起来了，那 lesson-3 就是对 React 结合
 react-redux 进一步封装，使开发更加清爽，项目也更加容易迭代和维护。
 
-### [最后： 送福利啦~~~~]（https://github.com/ZengTianShengZ/react-lesson/blob/master/lesson-4/README.md）
+### [最后： 送福利啦~~~~](https://github.com/ZengTianShengZ/react-lesson/blob/master/lesson-4/README.md)
 
 之前在开发 Vue 项目的时候,用到了 vue-cli 脚手架,很是方便.到了 React项目,想着是否自己
 也可以定制一套实用的脚手架,刚好,了解到可以做基于yeoman generator的npm包.于是倒腾出来这套

@@ -100,4 +100,6 @@ npm run online
    - 本项目采用 React 框架 , react-redux做数据状态管理,react-router做路由转发
    - 用 webpack 编译打包项目,实现生产,预发,线上不同环境下的调试开发
 
+> #### 最后：有问题可以一起探讨 ，欢迎issues 和 `star`
+
 ### [z-react-cli  脚手架npm 安装包 -->](https://www.npmjs.com/package/generator-z-react-cli)
