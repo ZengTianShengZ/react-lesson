@@ -102,4 +102,10 @@ npm run online
 
 > #### 最后：有问题可以一起探讨 ，欢迎issues 和 `star`
 
-### [z-react-cli  脚手架npm 安装包 -->](https://www.npmjs.com/package/generator-z-react-cli)
+### z-react-cli 脚手架安装包 [npm](https://www.npmjs.com/package/generator-z-react-cli)
+
+### 更新于 2017-7-13
+
+或许你需要更强大的脚手架 z-web-cli
+新版脚手架集成 React 和 h5 前端项目构建框架，也是基于yeoman generator的npm包
+[点击查看 npm ](https://www.npmjs.com/package/generator-z-web-cli)
