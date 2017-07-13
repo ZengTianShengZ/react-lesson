@@ -1,7 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import {History, Link } from 'react-router';
 import {connect} from 'react-redux';
-import { is, fromJS} from 'immutable';
 import template from './common/template'
 import Loading from './Loading'
 
@@ -24,7 +23,6 @@ class Page2 extends Component{
         return(
             <div id='Page2'>
                 <Loading />
-                {/* <p>{fData.data.data.stories[0].title}</p> */}
                 <div className='page-head'>
                   <p className="lesson-3">page2 component</p>
                   <div className='test-data'>
@@ -41,7 +39,6 @@ class Page2 extends Component{
         )
     }
     shouldComponentUpdate(nextProps, nextState){
-
        return  true;
     }
 }

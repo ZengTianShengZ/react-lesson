@@ -16,7 +16,6 @@ const dispathData = (path,json) => {
     path:path,
     json:json
   }
-
 }
 export const fetchData = (url ,data) => {
    return dispatch =>{

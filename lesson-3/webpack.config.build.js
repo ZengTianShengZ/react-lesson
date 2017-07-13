@@ -9,7 +9,6 @@ var APP_PATH = path.resolve(ROOT_PATH, 'src'); //__dirname 中的src目录，以
 var APP_FILE = path.resolve(APP_PATH, 'app'); //根目录文件app.jsx地址
 var BUILD_PATH = path.resolve(ROOT_PATH, './build/static'); //发布文件所存放的目录/pxq/dist/前面加/报错？
 
-
 module.exports = {
     entry: {
         app: APP_FILE,
