@@ -61,4 +61,6 @@ react-redux 进一步封装，使开发更加清爽，项目也更加容易迭�
 也可以定制一套实用的脚手架,刚好,了解到可以做基于yeoman generator的npm包.于是倒腾出来这套
 基于 react+es6+redux+router 的架手架.
 
+### [项目实战 react-yqy](https://github.com/ZengTianShengZ/react-yqy)
+
 > #### 最后：有问题可以一起探讨 ，欢迎issues 和 `star`
